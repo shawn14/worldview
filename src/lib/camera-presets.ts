@@ -1,0 +1,68 @@
+import type { CameraPreset } from "@/types";
+
+export const CAMERA_PRESETS: CameraPreset[] = [
+  {
+    name: "Pentagon",
+    longitude: -77.0558,
+    latitude: 38.8711,
+    height: 800,
+    heading: 0,
+    pitch: -45,
+  },
+  {
+    name: "Kremlin",
+    longitude: 37.6173,
+    latitude: 55.7520,
+    height: 800,
+    heading: 0,
+    pitch: -45,
+  },
+  {
+    name: "NYC",
+    longitude: -74.006,
+    latitude: 40.7128,
+    height: 2000,
+    heading: -20,
+    pitch: -35,
+  },
+  {
+    name: "Area 51",
+    longitude: -115.8111,
+    latitude: 37.2350,
+    height: 5000,
+    heading: 0,
+    pitch: -30,
+  },
+  {
+    name: "Great Wall",
+    longitude: 116.5704,
+    latitude: 40.4319,
+    height: 1500,
+    heading: 45,
+    pitch: -30,
+  },
+  {
+    name: "Taipei 101",
+    longitude: 121.5654,
+    latitude: 25.0330,
+    height: 800,
+    heading: 0,
+    pitch: -40,
+  },
+  {
+    name: "Giza",
+    longitude: 31.1342,
+    latitude: 29.9792,
+    height: 1200,
+    heading: -30,
+    pitch: -35,
+  },
+  {
+    name: "Cape Canaveral",
+    longitude: -80.6041,
+    latitude: 28.3922,
+    height: 3000,
+    heading: 0,
+    pitch: -25,
+  },
+];
