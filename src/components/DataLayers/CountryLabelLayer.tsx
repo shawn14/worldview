@@ -44,18 +44,21 @@ export default function CountryLabelLayer({
           position: Cesium.Cartesian3.fromDegrees(country.lon, country.lat),
           label: {
             text: country.name.toUpperCase(),
-            font: "12px monospace",
-            fillColor: new Cesium.Color(0.0, 1.0, 0.255, 0.9), // #00ff41
+            font: "bold 16px monospace",
+            fillColor: new Cesium.Color(0.0, 1.0, 0.255, 1.0), // #00ff41
             outlineColor: Cesium.Color.BLACK,
-            outlineWidth: 3,
+            outlineWidth: 4,
             style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+            showBackground: true,
+            backgroundColor: new Cesium.Color(0, 0, 0, 0.6),
+            backgroundPadding: new Cesium.Cartesian2(6, 4),
             verticalOrigin: Cesium.VerticalOrigin.CENTER,
             horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
             scaleByDistance: new Cesium.NearFarScalar(
               1_000_000,
               1.0,
               20_000_000,
-              0.5
+              0.6
             ),
             distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
               100_000,
