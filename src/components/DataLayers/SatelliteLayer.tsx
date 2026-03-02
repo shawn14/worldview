@@ -28,10 +28,11 @@ export default function SatelliteLayer({
 
     if (!enabled || positions.length === 0) return;
 
+    let cancelled = false;
+
     (async () => {
       const Cesium = await import("cesium");
-      const viewer = viewerRef.current;
-      if (!viewer || viewer.isDestroyed()) return;
+      if (cancelled || viewer.isDestroyed()) return;
 
       const collection = new Cesium.PointPrimitiveCollection();
 
@@ -40,7 +41,7 @@ export default function SatelliteLayer({
           position: Cesium.Cartesian3.fromDegrees(
             sat.longitude,
             sat.latitude,
-            sat.altitude * 1000 // km to meters
+            sat.altitude * 1000
           ),
           pixelSize: 2.5,
           color: Cesium.Color.CYAN.withAlpha(0.85),
@@ -56,7 +57,7 @@ export default function SatelliteLayer({
     })();
 
     return () => {
-      const viewer = viewerRef.current;
+      cancelled = true;
       if (viewer && !viewer.isDestroyed() && collectionRef.current) {
         viewer.scene.primitives.remove(collectionRef.current);
         collectionRef.current = null;

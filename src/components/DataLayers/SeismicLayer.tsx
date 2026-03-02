@@ -50,8 +50,7 @@ export default function SeismicLayer({
 
     (async () => {
       const Cesium = await import("cesium");
-      const viewer = viewerRef.current;
-      if (!viewer || viewer.isDestroyed() || cancelled) return;
+      if (viewer.isDestroyed() || cancelled) return;
 
       const ids: string[] = [];
       const pulsingEntities: Array<{
@@ -95,9 +94,7 @@ export default function SeismicLayer({
       // Pulse animation
       const startTime = Date.now();
       function animate() {
-        if (cancelled) return;
-        const viewer = viewerRef.current;
-        if (!viewer || viewer.isDestroyed()) return;
+        if (cancelled || !viewer || viewer.isDestroyed()) return;
 
         const elapsed = (Date.now() - startTime) / 1000;
         const pulse = 0.8 + 0.4 * Math.sin(elapsed * 2.5); // oscillate 0.8-1.2
@@ -129,7 +126,6 @@ export default function SeismicLayer({
         cancelAnimationFrame(animationRef.current);
         animationRef.current = null;
       }
-      const viewer = viewerRef.current;
       if (viewer && !viewer.isDestroyed()) {
         for (const id of entityIdsRef.current) {
           const entity = viewer.entities.getById(id);
