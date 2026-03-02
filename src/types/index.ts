@@ -65,7 +65,8 @@ export type DataLayer =
   | "satellites"
   | "seismic"
   | "traffic"
-  | "cameras";
+  | "cameras"
+  | "labels";
 
 // Camera preset for fly-to locations
 export interface CameraPreset {

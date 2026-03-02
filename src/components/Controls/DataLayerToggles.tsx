@@ -15,6 +15,7 @@ const LAYERS: LayerConfig[] = [
   { id: "seismic", label: "SEISMIC", description: "Earthquake activity" },
   { id: "traffic", label: "TRAFFIC", description: "Ground vehicle simulation" },
   { id: "cameras", label: "CCTV", description: "Surveillance cameras" },
+  { id: "labels", label: "LABELS", description: "Country name labels" },
 ];
 
 interface DataLayerTogglesProps {

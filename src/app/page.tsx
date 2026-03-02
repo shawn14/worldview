@@ -43,6 +43,10 @@ const CCTVLayer = dynamic(
   () => import("@/components/DataLayers/CCTVLayer"),
   { ssr: false }
 );
+const CountryLabelLayer = dynamic(
+  () => import("@/components/DataLayers/CountryLabelLayer"),
+  { ssr: false }
+);
 const EntityInfoPanel = dynamic(
   () => import("@/components/Panels/EntityInfoPanel"),
   { ssr: false }
@@ -148,6 +152,10 @@ export default function WorldViewPage() {
         viewerRef={viewerRef}
         enabled={activeLayers.has("cameras")}
         onSelect={setSelectedCamera}
+      />
+      <CountryLabelLayer
+        viewerRef={viewerRef}
+        enabled={activeLayers.has("labels")}
       />
 
       {/* Info Panels */}
