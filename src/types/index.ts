@@ -66,7 +66,19 @@ export type DataLayer =
   | "seismic"
   | "traffic"
   | "cameras"
-  | "labels";
+  | "labels"
+  | "weather"
+  | "alerts";
+
+// Geopolitical alert zone
+export interface AlertZone {
+  id: string;
+  name: string;
+  description: string;
+  type: "active-conflict" | "tension-zone" | "disputed-territory";
+  severity: "red" | "amber";
+  polygon: [number, number][]; // [lat, lon][]
+}
 
 // Camera preset for fly-to locations
 export interface CameraPreset {
@@ -76,4 +88,14 @@ export interface CameraPreset {
   height: number;
   heading: number;
   pitch: number;
+}
+
+// YouTube live webcam feed
+export interface LiveCam {
+  id: string;
+  name: string;
+  city: string;
+  latitude: number;
+  longitude: number;
+  youtubeId: string;
 }

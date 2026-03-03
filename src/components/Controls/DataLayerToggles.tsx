@@ -16,6 +16,8 @@ const LAYERS: LayerConfig[] = [
   { id: "traffic", label: "TRAFFIC", description: "Ground vehicle simulation" },
   { id: "cameras", label: "CCTV", description: "Surveillance cameras" },
   { id: "labels", label: "LABELS", description: "Country name labels" },
+  { id: "weather", label: "WEATHER", description: "Radar precipitation" },
+  { id: "alerts", label: "ALERTS", description: "Geopolitical alert zones" },
 ];
 
 interface DataLayerTogglesProps {
@@ -35,27 +37,28 @@ export default function DataLayerToggles({
       {LAYERS.map(({ id, label, description }) => {
         const active = activeLayers.has(id);
         return (
-          <button
-            key={id}
-            onClick={() => onToggle(id)}
-            className={`w-full flex items-center gap-2 px-2 py-1.5 text-left
-              border transition-all duration-200 font-mono
-              ${
-                active
-                  ? "bg-green-400/10 border-green-400/40 text-green-400"
-                  : "bg-black/60 border-green-400/15 text-green-400/40 hover:border-green-400/30"
-              }`}
-          >
-            <div
-              className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                active ? "bg-green-500" : "bg-gray-700"
-              }`}
-            />
-            <div>
-              <div className="text-[10px] tracking-wider uppercase">{label}</div>
-              <div className="text-[8px] opacity-50">{description}</div>
-            </div>
-          </button>
+          <div key={id}>
+            <button
+              onClick={() => onToggle(id)}
+              className={`w-full flex items-center gap-2 px-2 py-1.5 text-left
+                border transition-all duration-200 font-mono
+                ${
+                  active
+                    ? "bg-green-400/10 border-green-400/40 text-green-400"
+                    : "bg-black/60 border-green-400/15 text-green-400/40 hover:border-green-400/30"
+                }`}
+            >
+              <div
+                className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                  active ? "bg-green-500" : "bg-gray-700"
+                }`}
+              />
+              <div>
+                <div className="text-[10px] tracking-wider uppercase">{label}</div>
+                <div className="text-[8px] opacity-50">{description}</div>
+              </div>
+            </button>
+          </div>
         );
       })}
     </div>

@@ -3,13 +3,14 @@
 import { useState, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import type { Viewer } from "cesium";
-import type { FilterMode, DataLayer, FlightData, CameraData } from "@/types";
+import type { FilterMode, DataLayer, FlightData, CameraData, LiveCam, AlertZone } from "@/types";
 import HUDOverlay from "@/components/HUD/HUDOverlay";
 import Crosshair from "@/components/HUD/Crosshair";
 import StatusIndicators from "@/components/HUD/StatusIndicators";
 import FilterModeSelector from "@/components/Controls/FilterModeSelector";
 import DataLayerToggles from "@/components/Controls/DataLayerToggles";
 import CameraPresets from "@/components/Controls/CameraPresets";
+import { ISS_CAM } from "@/lib/live-cams";
 
 // Dynamic imports for Cesium-dependent components (no SSR)
 const CesiumViewer = dynamic(() => import("@/components/CesiumViewer"), {
@@ -47,12 +48,36 @@ const CountryLabelLayer = dynamic(
   () => import("@/components/DataLayers/CountryLabelLayer"),
   { ssr: false }
 );
+const WeatherLayer = dynamic(
+  () => import("@/components/DataLayers/WeatherLayer"),
+  { ssr: false }
+);
 const EntityInfoPanel = dynamic(
   () => import("@/components/Panels/EntityInfoPanel"),
   { ssr: false }
 );
 const CameraFeedPanel = dynamic(
   () => import("@/components/Panels/CameraFeedPanel"),
+  { ssr: false }
+);
+const LiveCamPanel = dynamic(
+  () => import("@/components/Panels/LiveCamPanel"),
+  { ssr: false }
+);
+const LocationSearch = dynamic(
+  () => import("@/components/Controls/LocationSearch"),
+  { ssr: false }
+);
+const LandmarkLayer = dynamic(
+  () => import("@/components/DataLayers/LandmarkLayer"),
+  { ssr: false }
+);
+const AlertZoneLayer = dynamic(
+  () => import("@/components/DataLayers/AlertZoneLayer"),
+  { ssr: false }
+);
+const AlertInfoPanel = dynamic(
+  () => import("@/components/Panels/AlertInfoPanel"),
   { ssr: false }
 );
 
@@ -64,7 +89,15 @@ export default function WorldViewPage() {
   const [activeLayers, setActiveLayers] = useState<Set<DataLayer>>(DEFAULT_LAYERS);
   const [selectedFlight, setSelectedFlight] = useState<FlightData | null>(null);
   const [selectedCamera, setSelectedCamera] = useState<CameraData | null>(null);
+  const [selectedLiveCam, setSelectedLiveCam] = useState<LiveCam | null>(null);
+  const [selectedAlert, setSelectedAlert] = useState<AlertZone | null>(null);
 
+  const handleLiveCamFound = useCallback((cam: LiveCam | null) => {
+    setSelectedLiveCam(cam);
+  }, []);
+  const handleISSClick = useCallback(() => {
+    setSelectedLiveCam(ISS_CAM);
+  }, []);
   const toggleLayer = useCallback((layer: DataLayer) => {
     setActiveLayers((prev) => {
       const next = new Set(prev);
@@ -108,6 +141,16 @@ export default function WorldViewPage() {
       label: "CCTV",
       status: activeLayers.has("cameras") ? ("active" as const) : ("disabled" as const),
     },
+    {
+      layer: "weather" as DataLayer,
+      label: "WEATHER",
+      status: activeLayers.has("weather") ? ("active" as const) : ("disabled" as const),
+    },
+    {
+      layer: "alerts" as DataLayer,
+      label: "ALERTS",
+      status: activeLayers.has("alerts") ? ("active" as const) : ("disabled" as const),
+    },
   ];
 
   return (
@@ -127,7 +170,10 @@ export default function WorldViewPage() {
         onModeChange={setFilterMode}
       />
       <DataLayerToggles activeLayers={activeLayers} onToggle={toggleLayer} />
-      <CameraPresets viewerRef={viewerRef} />
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 pointer-events-auto">
+        <LocationSearch viewerRef={viewerRef} onLiveCamFound={handleLiveCamFound} />
+      </div>
+      <CameraPresets viewerRef={viewerRef} onLiveCamFound={handleLiveCamFound} />
 
       {/* Data Layers */}
       <FlightLayer
@@ -139,6 +185,7 @@ export default function WorldViewPage() {
       <SatelliteLayer
         viewerRef={viewerRef}
         enabled={activeLayers.has("satellites")}
+        onISSClick={handleISSClick}
       />
       <SeismicLayer
         viewerRef={viewerRef}
@@ -157,6 +204,16 @@ export default function WorldViewPage() {
         viewerRef={viewerRef}
         enabled={activeLayers.has("labels")}
       />
+      <WeatherLayer
+        viewerRef={viewerRef}
+        enabled={activeLayers.has("weather")}
+      />
+      <LandmarkLayer viewerRef={viewerRef} />
+      <AlertZoneLayer
+        viewerRef={viewerRef}
+        enabled={activeLayers.has("alerts")}
+        onSelect={setSelectedAlert}
+      />
 
       {/* Info Panels */}
       {selectedFlight && (
@@ -169,6 +226,18 @@ export default function WorldViewPage() {
         <CameraFeedPanel
           camera={selectedCamera}
           onClose={() => setSelectedCamera(null)}
+        />
+      )}
+      {selectedLiveCam && (
+        <LiveCamPanel
+          cam={selectedLiveCam}
+          onClose={() => setSelectedLiveCam(null)}
+        />
+      )}
+      {selectedAlert && (
+        <AlertInfoPanel
+          zone={selectedAlert}
+          onClose={() => setSelectedAlert(null)}
         />
       )}
     </div>
