@@ -1,16 +1,46 @@
 "use client";
 
-import { MutableRefObject, useState } from "react";
+import { MutableRefObject, useState, useMemo } from "react";
 import { Cartesian3, Math as CesiumMath } from "cesium";
 import { CAMERA_PRESETS } from "@/lib/camera-presets";
+import { findNearbyCam } from "@/lib/live-cams";
+import { useSatelliteData } from "@/hooks/useSatelliteData";
 import type { Viewer } from "cesium";
+import type { LiveCam } from "@/types";
+
+const ISS_NORAD_ID = 25544;
 
 interface CameraPresetsProps {
   viewerRef: MutableRefObject<Viewer | null>;
+  onLiveCamFound?: (cam: LiveCam | null) => void;
 }
 
-export default function CameraPresets({ viewerRef }: CameraPresetsProps) {
+export default function CameraPresets({ viewerRef, onLiveCamFound }: CameraPresetsProps) {
   const [locating, setLocating] = useState(false);
+  const satellites = useSatelliteData();
+  const issPosition = useMemo(
+    () => satellites.find((s) => s.noradId === ISS_NORAD_ID) ?? null,
+    [satellites]
+  );
+
+  const flyToISS = () => {
+    const viewer = viewerRef.current;
+    if (!viewer || viewer.isDestroyed() || !issPosition) return;
+
+    viewer.camera.flyTo({
+      destination: Cartesian3.fromDegrees(
+        issPosition.longitude,
+        issPosition.latitude,
+        issPosition.altitude * 1000 + 50_000 // 50km above ISS for good viewing angle
+      ),
+      orientation: {
+        heading: 0,
+        pitch: CesiumMath.toRadians(-45),
+        roll: 0,
+      },
+      duration: 2.5,
+    });
+  };
 
   const flyTo = (preset: (typeof CAMERA_PRESETS)[number]) => {
     const viewer = viewerRef.current;
@@ -28,6 +58,9 @@ export default function CameraPresets({ viewerRef }: CameraPresetsProps) {
         roll: 0,
       },
       duration: 2.0,
+      complete: () => {
+        onLiveCamFound?.(findNearbyCam(preset.latitude, preset.longitude));
+      },
     });
   };
 
@@ -80,6 +113,19 @@ export default function CameraPresets({ viewerRef }: CameraPresetsProps) {
           }`}
       >
         {locating ? "GPS..." : "MY LOC"}
+      </button>
+      <button
+        onClick={flyToISS}
+        disabled={!issPosition}
+        className={`px-2 py-1 text-[10px] font-mono uppercase tracking-wider
+          border transition-all duration-200
+          ${
+            issPosition
+              ? "bg-black/60 border-white/30 text-white/80 hover:bg-white/10 hover:border-white/60 hover:text-white"
+              : "bg-black/60 border-green-400/15 text-green-400/30 cursor-not-allowed"
+          }`}
+      >
+        ISS
       </button>
       {CAMERA_PRESETS.map((preset) => (
         <button
